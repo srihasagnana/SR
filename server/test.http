@@ -1,0 +1,246 @@
+#village-req
+
+###
+GET http://localhost:9125/village-api/village
+
+###
+GET http://localhost:9125/village-api/village/sarika0acom
+
+###
+POST http://localhost:9125/village-api/village
+Content-Type: application/json
+
+{
+  "name": "rampur Village",
+  "email": "rampur@example.com",
+  "password": "hashedpassword123",
+  "address": "Rajapur, Maharashtra, India",
+  "contact": "+91 9876543210",
+  "approved": true,
+  "sarpanch": true,
+  "problems": [
+    {
+      "description": "Current issue in the main street",
+      "reported_by": "Vikas Sharma",
+      "status": "pending",
+      "assigned_trust": null
+    }
+  ]
+}
+
+###
+PUT http://localhost:9125/village-api/village
+Content-Type: application/json
+
+{
+  "name": "rampur Village",
+  "email": "rampur@example.com",
+  "password": "hashedpassword123",
+  "address": "Rajapur, India",
+  "contact": "+91 9876543210",
+  "approved": false,
+  "sarpanch": true,
+  "problems": [
+    {
+      "description": "Current issue in the main street",
+      "reported_by": "Vikas Sharma",
+      "status": "pending",
+      "assigned_trust": null
+    }
+  ]
+}
+
+
+# trust-req
+
+###
+GET http://localhost:9125/trust-api/trust
+
+###
+POST http://localhost:9125/trust-api/trust
+Content-Type: application/json
+
+{
+  "name": "Helping Hands Trust",
+  "username":"HHTT",
+  "email": "helpinghands@example.com",
+  "password": "securepassword",
+  "address": "456 Charity Lane, City, Country",
+  "contact": "9876543211",
+  "approved": true,
+  "projects": {
+    "past": [
+      {
+        "title": "Food Distribution Drive",
+        "description": "Provided free meals to 500 families.",
+        "completionDate": "2024-01-15T00:00:00.000Z"
+      }
+    ],
+    "ongoing": [
+      {
+        "title": "Education for All",
+        "description": "Providing school supplies and scholarships.",
+        "startDate": "2024-02-01T00:00:00.000Z",
+        "progressUpdates": [
+          {
+            "date": "2024-02-10T00:00:00.000Z",
+            "update": "Supplies distributed to 200 students."
+          }
+        ]
+      }
+    ],
+    "future": [
+      {
+        "title": "Healthcare Camp",
+        "description": "Organizing a free medical checkup camp.",
+        "plannedStartDate": "2024-06-01T00:00:00.000Z"
+      }
+    ]
+  },
+  "funding": {
+    "total_received": 100000,
+    "total_disbursed": 75000
+  },
+  "resources": ["Medicines", "Books", "Clothing"],
+  "money_support_available": true,
+  "feedback": [
+    {
+      "village_id": "65d4c0f5e1234567890abcd2",
+      "message": "Trust provided great support in setting up a library.",
+      "rating": 5
+    }
+  ],
+  "initiatives": [
+    {
+      "title": "Clean Water Project",
+      "description": "Setting up water filtration systems in remote villages.",
+      "villager_requests": [
+        {
+          "village_id": "65d4c0f5e1234567890abcd3",
+          "request_date": "2024-02-05T00:00:00.000Z",
+          "status": "approved"
+        }
+      ]
+    }
+  ],
+  "assigned_problems": [
+    {
+      "problem_id": "65d4c0f5e1234567890abcd4",
+      "village_id": "65d4c0f5e1234567890abcd5",
+      "status": "in-progress"
+    }
+  ],
+  "rating": 4.8
+}
+
+###
+PUT http://localhost:9125/trust-api/trust
+Content-Type: application/json
+
+{
+  "name": "Rajapur Village",
+  "username":"HHTT",
+  "email": "helpinghands@example.com",
+  "password": "hashedpassword123",
+  "address": "Rajapur, Maharashtra, India",
+  "contact": "+91 9876543210",
+  "approved": false,
+  "sarpanch": true,
+  "problems": [
+    {
+      "description": "Water supply issue in the main street",
+      "reported_by": "Vikas Sharma",
+      "status": "on process",
+      "assigned_trust": "abc"
+    },
+    {
+      "description": "Broken street lights in the village center",
+      "reported_by": "Sunita Devi",
+      "status": "done",
+      "assigned_trust": "65f1234abcd56789ef012345"
+    }
+  ],
+  "feedback": [
+    {
+      "trust_id": "65f5678abcd90123ef456789",
+      "message": "The trust provided good support for the school renovation.",
+      "rating": 4
+    }
+  ],
+  "resources_shared": [
+    {
+      "trust_id": "65f9876abcd54321ef098765",
+      "resources": ["Wheat", "Rice", "Medical Supplies"]
+    }
+  ],
+  "money_lent": [
+    {
+      "trust_id": "65f4321abcd67890ef123456",
+      "amount": 50000,
+      "date": "2025-01-15T00:00:00.000Z"
+    }
+  ],
+  "rating": 4.5
+}
+
+
+
+# individual-req
+
+###
+GET http://localhost:9125/individual-api/individual
+
+###
+POST http://localhost:9125/individual-api/individual
+Content-Type: application/json
+
+{
+  "username": "John Doe",
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "password": "securepassword",
+  "address": "123 Main Street, City, Country",
+  "contact": "9876543210",
+  "funding": [
+    {
+      "recipient_type": "Trust",
+      "recipient_id": "65d4c0f5e1234567890abcde",
+      "amount": 5000
+    }
+  ],
+  "resources_shared": [
+    {
+      "recipient_type": "Village",
+      "recipient_id": "65d4c0f5e1234567890abcd1",
+      "resources": ["Books", "Clothes"]
+    }
+  ],
+  "rating": 4.5
+}
+
+###
+PUT http://localhost:9125/individual-api/individual
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "johndoe@example.com",
+  "password": "securepassword",
+  "address": "nMain Street, City, Country",
+  "contact": "9876543210",
+  "funding": [
+    {
+      "recipient_type": "Trust",
+      "recipient_id": "65d4c0f5e1234567890abcde",
+      "amount": 5000
+    }
+  ],
+  "resources_shared": [
+    {
+      "recipient_type": "Village",
+      "recipient_id": "65d4c0f5e1234567890abcd1",
+      "resources": ["Books", "Clothes"]
+    }
+  ],
+  "rating": 4.5
+}
