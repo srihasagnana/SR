@@ -13,7 +13,8 @@ function Register_vi() {
       setRegisterDetails(obj);
   
       try {
-          let res = await axios.post('http://localhost:9125/village-api/village', obj);
+        seterror('')
+          let res = await axios.post(`http://localhost:9125/village-api/village`, obj);
           console.log(res);
   
           if (res.status === 201) {
@@ -55,6 +56,12 @@ function Register_vi() {
         {errors.phonenumber?.type==='maxLength' && <p className='fs-6 text-danger'>&Phone number must have 10 digits</p>}
         {errors.phonenumber && <p>{errors.phonenumber.message}</p>}
       </div>
+      
+      <div className='mb-3 '>
+        <label htmlFor="" className='form-label '>State</label>
+        <input type="text" {...register("state",{required:true})} className='form-control w-100'/>
+        {errors.address?.type==='required' && <p className='fs-6 text-danger'>*State is required</p>}
+      </div>
       </div>
       
       <div className="col-md-6">
@@ -80,11 +87,11 @@ function Register_vi() {
         {errors.password?.type==='maxLength' && <p className='fs-6 text-danger'>*Password must not exceed 16 characters</p>}
         {errors.password && <p className='fs-6 text-danger'>*{errors.password.message}</p>}
       </div>
-      </div>
       <div className='mb-3 '>
-        <label htmlFor="" className='form-label '>Address</label>
-        <input type="text" {...register("address",{required:true})} className='form-control w-100'/>
-        {errors.address?.type==='required' && <p className='fs-6 text-danger'>*Address is required</p>}
+        <label htmlFor="" className='form-label '>Pincode</label>
+        <input type="text" {...register("pincode",{required:true})} className='form-control w-100'/>
+        {errors.address?.type==='required' && <p className='fs-6 text-danger'>*Pincode is required</p>}
+      </div>
       </div>
       </div>
       <div className='d-flex justify-content-center'>

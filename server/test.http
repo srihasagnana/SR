@@ -3,30 +3,144 @@
 ###
 GET http://localhost:9125/village-api/village
 
+
 ###
-GET http://localhost:9125/village-api/village/sarika0acom
+GET http://localhost:9125/village-api/village/67fcf2d87fe5dbaf2686b01d/problem-status
+
+###
+GET http://localhost:9125/village-api/village/tangeda
 
 ###
 POST http://localhost:9125/village-api/village
 Content-Type: application/json
 
 {
-  "name": "rampur Village",
-  "email": "rampur@example.com",
-  "password": "hashedpassword123",
-  "address": "Rajapur, Maharashtra, India",
-  "contact": "+91 9876543210",
+  "name": "Anantharam",
+  "email": "sarpanch.anantharam@example.com",
+  "password": "abc@123",
+  "pincode": 506101,
+  "state": "Telangana",
+  "contact": "9876543210",
   "approved": true,
   "sarpanch": true,
   "problems": [
     {
-      "description": "Current issue in the main street",
-      "reported_by": "Vikas Sharma",
-      "status": "pending",
-      "assigned_trust": null
+      "description": "Repair broken borewell",
+      "reported_by": "Ravi",
+      "status": "ongoing",
+      "assigned_trust": "660f63e1356e4c246b12fa9a",
+      "money_trust": 8000,
+      "posted_time": "2024-03-28T08:00:00.000Z",
+      "money_sanction_time": "2024-03-29T10:00:00.000Z",
+      "solved_time": null
+    },
+    {
+      "description": "Build compost pit near farms",
+      "reported_by": "Geeta",
+      "status": "upcoming",
+      "assigned_trust": "660f63e1356e4c246b12fa9b",
+      "money_trust": 6000,
+      "posted_time": "2024-04-10T09:00:00.000Z",
+      "money_sanction_time": null,
+      "solved_time": null
+    },
+    {
+      "description": "Clean drainage system",
+      "reported_by": "Mohan",
+      "status": "done",
+      "assigned_trust": "660f63e1356e4c246b12fa9c",
+      "money_trust": 4500,
+      "posted_time": "2024-03-15T07:30:00.000Z",
+      "money_sanction_time": "2024-03-16T10:00:00.000Z",
+      "solved_time": "2024-03-20T17:00:00.000Z"
+    }
+  ],
+  "feedback": [
+    {
+      "trust_id": "660f63e1356e4c246b12fa9a",
+      "message": "Quick borewell service, villagers happy.",
+      "rating": 5
+    },
+    {
+      "trust_id": "660f63e1356e4c246b12fa9b",
+      "message": "Still waiting for compost pit to begin.",
+      "rating": 3
+    },
+    {
+      "trust_id": "660f63e1356e4c246b12fa9c",
+      "message": "Drainage cleanup was thorough.",
+      "rating": 4
+    }
+  ],
+  "resources_shared": [
+    {
+      "trust_id": "660f63e1356e4c246b12fa9a",
+      "resources": ["Cement bags", "PVC pipes"]
+    },
+    {
+      "trust_id": "660f63e1356e4c246b12fa9b",
+      "resources": ["Gloves", "Compost bins"]
+    }
+  ],
+  "money_lent": [
+    {
+      "user_id": "660f63e1356e4c246b12fa9b",
+      "amount": 1500,
+      "date": "2024-04-06T09:00:00.000Z"
+    },
+    {
+      "user_id": "660f63e1356e4c246b12fa9c",
+      "amount": 2500,
+      "date": "2024-03-25T12:00:00.000Z"
+    }
+  ],
+  "rating": 4.3,
+  "trusts": [
+    {
+      "trust_name": "Helping Hands Trust",
+      "total_money": 15000
+    },
+    {
+      "trust_name": "Green Roots Foundation",
+      "total_money": 7000
+    },
+    {
+      "trust_name": "Village Uplift Trust",
+      "total_money": 9000
+    },
+    {
+      "trust_name": "Rural Aid Foundation",
+      "total_money": 11000
+    },
+    {
+      "trust_name": "Hope for Villages",
+      "total_money": 5000
+    }
+  ],
+  "user": [
+    {
+      "user_name": "Lakshmi Narayana",
+      "total_money": 1000
+    },
+    {
+      "user_name": "Radha Krishna",
+      "total_money": 500
+    },
+    {
+      "user_name": "Shanti Devi",
+      "total_money": 2000
+    },
+    {
+      "user_name": "Harish Reddy",
+      "total_money": 1500
+    },
+    {
+      "user_name": "Kavitha",
+      "total_money": 800
     }
   ]
 }
+
 
 ###
 PUT http://localhost:9125/village-api/village
@@ -50,6 +164,17 @@ Content-Type: application/json
   ]
 }
 
+###
+PUT http://localhost:9125/village-api/add-problem
+Content-Type: application/json
+
+{
+  "name": "tangeda",
+  "problem": {
+    "description": "ground pipeline broken",
+    "reported_by":"Rajesh"
+  }
+}
 
 # trust-req
 
@@ -182,6 +307,7 @@ Content-Type: application/json
   ],
   "rating": 4.5
 }
+
 
 
 

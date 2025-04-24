@@ -18,6 +18,8 @@ import Trust_header from './trust/Trust_header'
 import Individual_header from './individual/Individual_header'
 import Village_header from './village/Village_header'
 import Village_profile from './village/Village_profile'
+import Individual_profile from './individual/Individual_profile'
+import Add_prob from './village/Add_prob'
 function App() {
 
   let b = createBrowserRouter([
@@ -50,7 +52,7 @@ function App() {
               element:<Trust_header/>,
               children:[
             {
-              path:'profile',
+              path:'profile/:trust',
               element:<Trust_profile/>
             },
             {
@@ -96,7 +98,12 @@ function App() {
             {
               path:'users',
               element:<Users/>
-            }]
+            },
+            {
+              path:'add-problem',
+              element:<Add_prob/>
+            }
+          ]
           }
           ]
         },
@@ -121,8 +128,8 @@ function App() {
               element:<Individual_header/>,
               children:[
             {
-              path:'profile',
-              element:<Trust_profile/>
+              path:'profile/:name',
+              element:<Individual_profile/>
             },
             {
               path:'villages',

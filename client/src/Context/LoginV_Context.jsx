@@ -5,7 +5,6 @@ function LoginV_Context({children}) {
     let [currentVillage,setCurrentVillage]=useState("")
     let [error,setError]=useState('')
     let [loginStatus,setLoginStatus]=useState(false)
-
     async function handleVillageVerify({name,password}){
         setError("")
         let res= await axios.get(`http://localhost:9125/village-api/village/${name}`)
@@ -16,18 +15,20 @@ function LoginV_Context({children}) {
             } else {
                 setError("");
                 setCurrentVillage(VillageDetails.name);
+                localStorage.setItem("currentVillage", VillageDetails.name); 
                 setLoginStatus(true);
             }
         } else {
             setError(res.data.message || "Village not found");
         }
-        
     }
+    // console.log(currentVillage)
 
     function userLogout(){
         setCurrentVillage('');
         setLoginStatus(false);
         setError('')
+        localStorage.removeItem(currentVillage);
     }
   
   return (

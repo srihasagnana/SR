@@ -1,35 +1,207 @@
-const exp=require('express')
-const villageApp=exp.Router();
-const eah=require('express-async-handler')
+const exp = require('express')
+const villageApp = exp.Router();
+const eah = require('express-async-handler')
 const Village = require('../models/VillageSchema')
 villageApp.use(exp.json())
-villageApp.get('/village',eah(async(req,res)=>{
-     const villageList = await Village.find();
-     res.status(200).send({message:"Villages",payload:villageList})
+
+// Get all villages
+villageApp.get('/village', eah(async (req, res) => {
+    const villageList = await Village.find();
+    res.status(200).send({ message: "Villages", payload: villageList })
 }))
 
-villageApp.get('/village/:vi',eah(async(req,res)=>{
-    const village=req.params.vi
-    const villageList = await Village.find({name:village});
-    res.status(200).send({message:"Villages",payload:villageList})
-}))
-
-villageApp.post('/village',eah(async(req,res)=>{
-    const village = req.body
-    const dbres = await Village.findOne({email:village.email})
-    if(dbres)
-        res.status(409).send({message:"village already existed",payload:village})
-    else{
-        const villageDoc = Village(village)
-        let r=await villageDoc.save()
-        res.status(201).send({message:"Village added" ,payload:villageDoc})
+// Get specific village by name
+villageApp.get('/village/:name', eah(async (req, res) => {
+    const villageName = req.params.name
+    const village = await Village.findOne({ name: villageName });
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
     }
+    res.status(200).send({ message: "Village details", payload: village })
 }))
 
-villageApp.put('/village',eah(async(req,res)=>{
-    const village=req.body;
-    let updatedvillage=await Village.findOneAndUpdate({email:village.email},{$set:{...village}},{new:true})
-    res.send({message:"updated",payload:updatedvillage})
+// Create new village
+villageApp.post('/village', eah(async (req, res) => {
+    const villageData = req.body
+    const existingVillage = await Village.findOne({ email: villageData.email })
+    if (existingVillage) {
+        return res.status(409).send({ message: "Village already exists", payload: villageData })
+    }
+
+    const newVillage = new Village(villageData)
+    await newVillage.save()
+    res.status(201).send({ message: "Village added", payload: newVillage })
 }))
 
-module.exports=villageApp
+// Update village information
+villageApp.put('/village/:id', eah(async (req, res) => {
+    const villageId = req.params.id
+    const updateData = req.body
+    
+    const updatedVillage = await Village.findByIdAndUpdate(
+        villageId,
+        { $set: updateData },
+        { new: true, runValidators: true }
+    )
+    
+    if (!updatedVillage) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+    
+    res.send({ message: "Village updated", payload: updatedVillage })
+}))
+
+// Add problem to village
+villageApp.put('/village/:id/add-problem', eah(async (req, res) => {
+    const villageId = req.params.id
+    const { title, estimatedamt, description } = req.body
+    
+    const village = await Village.findById(villageId)
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+    
+    const newProblem = {
+        title,
+        estimatedamt,
+        description,
+        status: "pending",
+        posted_time: new Date()
+    }
+    
+    village.problems.push(newProblem)
+    await village.save()
+    
+    res.status(200).send({ 
+        message: "Problem added successfully", 
+        payload: village.problems[village.problems.length - 1] 
+    })
+}))
+
+// Update problem status (accept/start/done)
+const updateProblemStatus = async (req, res, action) => {
+    const { villageId, problemId } = req.params
+    const statusMap = {
+        accept: { village: "accepted", trust: "accepted", newStatus: "upcoming" },
+        start: { village: "started", trust: "started", newStatus: "ongoing" },
+        done: { village: "done", trust: "done", newStatus: "past" }
+    }
+    
+    const village = await Village.findById(villageId)
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+    
+    const problem = village.problems.id(problemId)
+    if (!problem) {
+        return res.status(404).send({ message: "Problem not found" })
+    }
+    
+    // Update based on who is making the request (village or trust)
+    if (req.userType === 'village') {
+        problem.done_by_village = statusMap[action].village
+    } else if (req.userType === 'trust') {
+        problem.done_by_trust = statusMap[action].trust
+    }
+    
+    // If both parties have completed the action, update overall status
+    if (problem.done_by_village === statusMap[action].village && 
+        problem.done_by_trust === statusMap[action].trust) {
+        problem.status = statusMap[action].newStatus
+    }
+    
+    await village.save()
+    res.status(200).send({ message: `Problem ${action}ed`, payload: problem })
+}
+
+villageApp.put('/village/:villageId/problem/:problemId/accept', 
+    eah(async (req, res) => updateProblemStatus(req, res, 'accept')))
+
+villageApp.put('/village/:villageId/problem/:problemId/start', 
+    eah(async (req, res) => updateProblemStatus(req, res, 'start')))
+
+villageApp.put('/village/:villageId/problem/:problemId/done', 
+    eah(async (req, res) => updateProblemStatus(req, res, 'done')))
+
+// Get problem status summary
+villageApp.get('/village/:id/problem-status', eah(async (req, res) => {
+    const villageId = req.params.id
+    const village = await Village.findById(villageId)
+
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+
+    const summary = {
+        pending: [],
+        ongoing: [],
+        upcoming: [],
+        past: [],
+        all: village.problems.length
+    }
+
+    village.problems.forEach(problem => {
+        if (problem.status === 'pending') summary.pending.push(problem)
+        else if (problem.status === 'ongoing') summary.ongoing.push(problem)
+        else if (problem.status === 'upcoming') summary.upcoming.push(problem)
+        else if (problem.status === 'past') summary.past.push(problem)
+    })
+
+    res.status(200).send({ message: "Problem status summary", payload: summary })
+}))
+
+// Get top contributors
+villageApp.get('/village/:id/top-contributors', eah(async (req, res) => {
+    const villageId = req.params.id
+    const village = await Village.findById(villageId).lean()
+
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+
+    const topTrusts = village.trusts
+        .sort((a, b) => b.total_money - a.total_money)
+        .slice(0, 3)
+        .map((trust, index) => ({
+            ...trust,
+            rank: index + 1,
+            type: 'trust'
+        }))
+
+    const topIndividuals = village.user
+        .sort((a, b) => (b.total_money || 0) - (a.total_money || 0))
+        .slice(0, 3)
+        .map((user, index) => ({
+            ...user,
+            rank: index + 1,
+            type: 'individual'
+        }))
+
+    res.status(200).send({ 
+        message: "Top contributors", 
+        payload: [...topTrusts, ...topIndividuals].sort((a, b) => a.rank - b.rank)
+    })
+}))
+
+// Delete problem
+villageApp.delete('/village/:villageId/problem/:problemId', eah(async (req, res) => {
+    const { villageId, problemId } = req.params
+
+    const village = await Village.findById(villageId)
+    if (!village) {
+        return res.status(404).send({ message: "Village not found" })
+    }
+
+    const problem = village.problems.id(problemId)
+    if (!problem) {
+        return res.status(404).send({ message: "Problem not found" })
+    }
+
+    problem.remove()
+    await village.save()
+
+    res.status(200).send({ message: "Problem removed successfully" })
+}))
+
+
+module.exports = villageApp

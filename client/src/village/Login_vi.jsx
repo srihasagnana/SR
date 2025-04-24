@@ -7,7 +7,7 @@ import { villageContext } from '../Context/LoginV_Context'
 function Login_vi() {
   const{register,handleSubmit,formState:{errors}}=useForm()
   const navigate = useNavigate()
-  const {currentVillage,error,setCurrentVillage,handleVillageVerify,userLogout,loginStatus}=useContext(villageContext)
+  const {currentVillage,error,handleVillageVerify,loginStatus}=useContext(villageContext)
 
   //navigate to userProfile upon successful login
   useEffect(() => {

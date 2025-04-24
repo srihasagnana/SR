@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const TrustSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -30,7 +30,7 @@ const TrustSchema = new mongoose.Schema({
         ],
       },
     ],
-    future: [
+    upcoming: [
       {
         title: String,
         description: String,
@@ -44,7 +44,6 @@ const TrustSchema = new mongoose.Schema({
     total_disbursed: { type: Number, default: 0 },
   },
 
-  resources: [String], // Resources Trust has
   money_support_available: { type: Boolean, default: false },
 
   feedback: [
@@ -63,7 +62,11 @@ const TrustSchema = new mongoose.Schema({
         {
           village_id: { type: mongoose.Schema.Types.ObjectId, ref: "Village" },
           request_date: { type: Date, default: Date.now },
-          status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+          status: {
+            type: String,
+            enum: ["pending", "approved", "rejected"],
+            default: "pending",
+          },
         },
       ],
     },
@@ -71,14 +74,18 @@ const TrustSchema = new mongoose.Schema({
 
   assigned_problems: [
     {
-      problem_id: { type: mongoose.Schema.Types.ObjectId, ref: "Village.problems" },
       village_id: { type: mongoose.Schema.Types.ObjectId, ref: "Village" },
-      status: { type: String, enum: ["in-progress", "solved"], default: "in-progress" },
+      problem_index: { type: Number, required: true }, // Index of the problem in Village.problems
+      status: {
+        type: String,
+        enum: ["in-progress", "solved"],
+        default: "in-progress",
+      },
     },
   ],
 
   rating: { type: Number, default: 0 }, // Trust rating based on contributions
 });
 
-const Trusts = mongoose.model("trust", TrustSchema);
-module.exports = Trusts
+const Trust = mongoose.model("Trust", TrustSchema);
+module.exports = Trust;

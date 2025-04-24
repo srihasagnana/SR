@@ -1,6 +1,14 @@
-import { Outlet,Link } from 'react-router-dom'
-
+import { Outlet,Link, useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { villageContext } from '../Context/LoginV_Context'
 function Village_header() {
+  const {userLogout}=useContext(villageContext)
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    userLogout();
+    navigate("/village/login"); // Redirect after logout
+  };
+
   return (
     <div>
       <div className='mt-3 ms-3'>
@@ -16,10 +24,19 @@ function Village_header() {
             <li className="nav-item">
                 <Link className="nav-link fs-3" to="profile">Profile</Link>
             </li>
+            <li>
+              <Link className="nav-link fs-3" to="add-problem">Add Problem</Link>
+            </li>
+            <li>
+              <button onClick={handleLogout} className='btn btn-danger p-2'>LogOut</button>
+            </li>
+            
             </div>
         </ul>
-      <Outlet></Outlet>
     </div>
+    <div className="px-3">
+        <Outlet />
+      </div>
     </div>
   )
 }
