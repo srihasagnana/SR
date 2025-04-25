@@ -15,7 +15,7 @@ const VillageSchema = new mongoose.Schema({
       title: { type: String },
       estimatedamt: { type: Number },
       description: { type: String },
-      status: { type: String, enum: ["upcoming", "ongoing", "past"], default: "upcoming" },
+      status: { type: String, enum: ["upcoming", "ongoing", "past"], default: "pending" },
       assigned_trust: { type: mongoose.Schema.Types.ObjectId, ref: "Trust", default: null },
       money_trust: { type: Number, default: 0 },
       posted_time: { type: Date, default: Date.now },

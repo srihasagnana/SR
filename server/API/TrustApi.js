@@ -41,7 +41,7 @@ trustApp.put('/trust', eah(async (req, res) => {
   res.send({ message: "updated", payload: updatedTrust });
 }));
 
-// ✅ Update a problem's status by trust
+// ✅ Update a problem's status by trust as accepted
 trustApp.put('/trust/accept', eah(async (req, res) => {
   const { villageId, problemId } = req.body;
 
@@ -62,6 +62,7 @@ trustApp.put('/trust/accept', eah(async (req, res) => {
   res.send({ message: "Trust status updated", payload: problem });
 }));
 
+// ✅ Update a problem's status by trust as started
 trustApp.put('/trust/start', eah(async (req, res) => {
     const { villageId, problemId } = req.body;
   
@@ -81,7 +82,7 @@ trustApp.put('/trust/start', eah(async (req, res) => {
     await village.save();
     res.send({ message: "Trust status updated", payload: problem });
   }));
-
+// ✅ Update a problem's status by trust as done
   trustApp.put('/trust/done', eah(async (req, res) => {
     const { villageId, problemId } = req.body;
   

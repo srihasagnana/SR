@@ -7,6 +7,8 @@ function Villages() {
   const [error, setError] = useState('');
   const [selectedVillage, setSelectedVillage] = useState(null);
 
+  
+
   async function fetchVillages() {
     try {
       const res = await axios.get('http://localhost:9125/village-api/village');

@@ -15,131 +15,64 @@ POST http://localhost:9125/village-api/village
 Content-Type: application/json
 
 {
-  "name": "Anantharam",
-  "email": "sarpanch.anantharam@example.com",
-  "password": "abc@123",
-  "pincode": 506101,
+  "name": "Tangeda",
+  "email": "sarika@gmail.com",
+  "password": "Abc@123",
   "state": "Telangana",
+  "pincode": "522414",
   "contact": "9876543210",
   "approved": true,
   "sarpanch": true,
+
   "problems": [
     {
-      "description": "Repair broken borewell",
-      "reported_by": "Ravi",
+      "title": "Water Supply System",
+      "estimatedamt": 500000,
+      "description": "Install new pipelines and water tanks",
       "status": "ongoing",
-      "assigned_trust": "660f63e1356e4c246b12fa9a",
-      "money_trust": 8000,
-      "posted_time": "2024-03-28T08:00:00.000Z",
-      "money_sanction_time": "2024-03-29T10:00:00.000Z",
-      "solved_time": null
-    },
-    {
-      "description": "Build compost pit near farms",
-      "reported_by": "Geeta",
-      "status": "upcoming",
-      "assigned_trust": "660f63e1356e4c246b12fa9b",
-      "money_trust": 6000,
-      "posted_time": "2024-04-10T09:00:00.000Z",
-      "money_sanction_time": null,
-      "solved_time": null
-    },
-    {
-      "description": "Clean drainage system",
-      "reported_by": "Mohan",
-      "status": "done",
-      "assigned_trust": "660f63e1356e4c246b12fa9c",
-      "money_trust": 4500,
-      "posted_time": "2024-03-15T07:30:00.000Z",
-      "money_sanction_time": "2024-03-16T10:00:00.000Z",
-      "solved_time": "2024-03-20T17:00:00.000Z"
+      "assigned_trust": "6601f7332a0e4d3b1c67e345",
+      "money_trust": 300000,
+      "posted_time": "2024-12-15T08:00:00Z",
+      "money_sanction_time": "2025-01-05T08:00:00Z",
+      "solved_time": null,
+      "done_by_village": "started",
+      "done_by_trust": "accepted"
     }
   ],
+
   "feedback": [
     {
-      "trust_id": "660f63e1356e4c246b12fa9a",
-      "message": "Quick borewell service, villagers happy.",
-      "rating": 5
-    },
-    {
-      "trust_id": "660f63e1356e4c246b12fa9b",
-      "message": "Still waiting for compost pit to begin.",
-      "rating": 3
-    },
-    {
-      "trust_id": "660f63e1356e4c246b12fa9c",
-      "message": "Drainage cleanup was thorough.",
+      "trust_id": "6601f7332a0e4d3b1c67e345",
+      "message": "Great collaboration!",
       "rating": 4
     }
   ],
-  "resources_shared": [
-    {
-      "trust_id": "660f63e1356e4c246b12fa9a",
-      "resources": ["Cement bags", "PVC pipes"]
-    },
-    {
-      "trust_id": "660f63e1356e4c246b12fa9b",
-      "resources": ["Gloves", "Compost bins"]
-    }
-  ],
+
   "money_lent": [
     {
-      "user_id": "660f63e1356e4c246b12fa9b",
-      "amount": 1500,
-      "date": "2024-04-06T09:00:00.000Z"
-    },
-    {
-      "user_id": "660f63e1356e4c246b12fa9c",
-      "amount": 2500,
-      "date": "2024-03-25T12:00:00.000Z"
+      "user_id": "6601f7332a0e4d3b1c67e345",
+      "amount": 200000,
+      "date": "2025-01-01T00:00:00Z"
     }
   ],
-  "rating": 4.3,
+
   "trusts": [
     {
-      "trust_name": "Helping Hands Trust",
-      "total_money": 15000
-    },
-    {
-      "trust_name": "Green Roots Foundation",
-      "total_money": 7000
-    },
-    {
-      "trust_name": "Village Uplift Trust",
-      "total_money": 9000
-    },
-    {
-      "trust_name": "Rural Aid Foundation",
-      "total_money": 11000
-    },
-    {
-      "trust_name": "Hope for Villages",
-      "total_money": 5000
+      "trust_name": "Hope Trust",
+      "total_money": 200000
     }
   ],
+
   "user": [
     {
-      "user_name": "Lakshmi Narayana",
-      "total_money": 1000
-    },
-    {
-      "user_name": "Radha Krishna",
-      "total_money": 500
-    },
-    {
-      "user_name": "Shanti Devi",
-      "total_money": 2000
-    },
-    {
-      "user_name": "Harish Reddy",
-      "total_money": 1500
-    },
-    {
-      "user_name": "Kavitha",
-      "total_money": 800
+      "user_name": "John Doe",
+      "total_money": 50000
     }
-  ]
+  ],
+
+  "rating": 4.5
 }
+
 
 
 ###
@@ -186,76 +119,101 @@ POST http://localhost:9125/trust-api/trust
 Content-Type: application/json
 
 {
-  "name": "Helping Hands Trust",
-  "username":"HHTT",
-  "email": "helpinghands@example.com",
-  "password": "securepassword",
-  "address": "456 Charity Lane, City, Country",
-  "contact": "9876543211",
+  "name": "Sarika",
+  "username": "helpinghands",
+  "email": "contact@helpinghands.org",
+  "password": "Abc@123",
+  "address": "456 Hope Street, Hyderabad, Telangana",
+  "contact": "9876543210",
   "approved": true,
+
   "projects": {
     "past": [
       {
-        "title": "Food Distribution Drive",
-        "description": "Provided free meals to 500 families.",
-        "completionDate": "2024-01-15T00:00:00.000Z"
+        "title": "School Kit Distribution",
+        "description": "Distributed school kits to underprivileged children",
+        "completionDate": "2024-12-15T00:00:00Z"
       }
     ],
     "ongoing": [
       {
-        "title": "Education for All",
-        "description": "Providing school supplies and scholarships.",
-        "startDate": "2024-02-01T00:00:00.000Z",
+        "title": "Village Cleanliness Drive",
+        "description": "Running awareness and cleaning programs",
+        "startDate": "2025-03-01T00:00:00Z",
         "progressUpdates": [
           {
-            "date": "2024-02-10T00:00:00.000Z",
-            "update": "Supplies distributed to 200 students."
+            "date": "2025-03-10T00:00:00Z",
+            "update": "Phase 1 completed: Public areas cleaned"
+          },
+          {
+            "date": "2025-03-20T00:00:00Z",
+            "update": "Phase 2 ongoing: Household waste management workshops"
           }
         ]
       }
     ],
-    "future": [
+    "upcoming": [
       {
-        "title": "Healthcare Camp",
-        "description": "Organizing a free medical checkup camp.",
-        "plannedStartDate": "2024-06-01T00:00:00.000Z"
+        "title": "Free Health Checkup Camp",
+        "description": "Health services to be provided in rural areas",
+        "plannedStartDate": "2025-06-01T00:00:00Z"
       }
     ]
   },
+
   "funding": {
-    "total_received": 100000,
-    "total_disbursed": 75000
+    "total_received": 1000000,
+    "total_disbursed": 750000
   },
-  "resources": ["Medicines", "Books", "Clothing"],
+
   "money_support_available": true,
+
   "feedback": [
     {
-      "village_id": "65d4c0f5e1234567890abcd2",
-      "message": "Trust provided great support in setting up a library.",
+      "village_id": "6601f7002a0e4d3b1c67e222",
+      "message": "The support was timely and helpful.",
       "rating": 5
+    },
+    {
+      "village_id": "6601f7002a0e4d3b1c67e333",
+      "message": "Great assistance with water project.",
+      "rating": 4
     }
   ],
+
   "initiatives": [
     {
-      "title": "Clean Water Project",
-      "description": "Setting up water filtration systems in remote villages.",
+      "title": "Digital Literacy Mission",
+      "description": "Educating villagers about basic computer usage",
       "villager_requests": [
         {
-          "village_id": "65d4c0f5e1234567890abcd3",
-          "request_date": "2024-02-05T00:00:00.000Z",
+          "village_id": "6601f7002a0e4d3b1c67e222",
+          "request_date": "2025-04-01T00:00:00Z",
           "status": "approved"
+        },
+        {
+          "village_id": "6601f7002a0e4d3b1c67e444",
+          "request_date": "2025-04-03T00:00:00Z",
+          "status": "pending"
         }
       ]
     }
   ],
+
   "assigned_problems": [
     {
-      "problem_id": "65d4c0f5e1234567890abcd4",
-      "village_id": "65d4c0f5e1234567890abcd5",
+      "village_id": "6601f7002a0e4d3b1c67e222",
+      "problem_index": 0,
       "status": "in-progress"
+    },
+    {
+      "village_id": "6601f7002a0e4d3b1c67e555",
+      "problem_index": 1,
+      "status": "solved"
     }
   ],
-  "rating": 4.8
+
+  "rating": 4.7
 }
 
 ###

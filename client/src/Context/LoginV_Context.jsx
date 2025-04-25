@@ -9,8 +9,9 @@ function LoginV_Context({children}) {
         setError("")
         let res= await axios.get(`http://localhost:9125/village-api/village/${name}`)
         if (res.data.payload) {
-            let VillageDetails = res.data.payload[0];
-            if (VillageDetails.password !== password) {
+            let VillageDetails = res.data.payload;
+            console.log(res.data)
+            if (VillageDetails?.password !== password) {
                 setError("Invalid Password");
             } else {
                 setError("");
