@@ -2,8 +2,6 @@ import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { villageContext } from "../Context/LoginV_Context";
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-
 const VillageProfile = () => {
   const { currentVillage } = useContext(villageContext);
   const [villageDetails, setVillageDetails] = useState(null);
@@ -12,47 +10,25 @@ const VillageProfile = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [trustsLoading, setTrustsLoading] = useState(false);
-  const [trustsError, setTrustsError] = useState(null);
-  const [individualsLoading, setIndividualsLoading] = useState(false);
-  const [individualsError, setIndividualsError] = useState(null);
-  const [mapLoading, setMapLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalProjects, setModalProjects] = useState([]);
   const [modalTitle, setModalTitle] = useState("");
-
-  const MAPS_API_KEY = "AIzaSyABCDEFGHIJKLMNOPQRSTUVWXYZ12345678"; // Replace with your actual key
-
-  const [projects, setProjects] = useState({
-    past: [],
-    ongoing: [],
-    upcoming: [],
-    pending: []
+  const [problemSummary, setProblemSummary] = useState({
+    pending: 0,
+    ongoing: 0,
+    upcoming: 0,
+    past: 0,
+    all: 0
   });
 
-  const projectCounts = {
-    past: projects.past.length,
-    ongoing: projects.ongoing.length,
-    upcoming: projects.upcoming.length,
-    pending: projects.pending.length
-  };
+  const MAPS_API_KEY = "AIzaSyABCDEFGHIJKLMNOPQRSTUVWXYZ12345678"; // Replace with your actual key
 
   const villageId = currentVillage || localStorage.getItem("villageId");
 
   const handleProjectClick = (projectType) => {
     setModalTitle(`${projectType.charAt(0).toUpperCase() + projectType.slice(1)} Projects`);
-    setModalProjects(projects[projectType]);
+    setModalProjects(villageDetails?.problems.filter(p => p.status === projectType) || []);
     setShowModal(true);
-  };
-
-  const calculateProjects = (problems) => {
-    if (!problems || !Array.isArray(problems)) return projects;
-    return {
-      past: problems.filter(p => p.status === "done"),
-      ongoing: problems.filter(p => p.status === "ongoing"),
-      upcoming: problems.filter(p => p.status === "upcoming"),
-      pending: problems.filter(p => p.status === "pending")
-    };
   };
 
   const getVillage = async () => {
@@ -64,10 +40,19 @@ const VillageProfile = () => {
     try {
       setLoading(true);
       const res = await axios.get(`http://localhost:9125/village-api/village/${villageId}`);
-      if (res.data.payload && res.data.payload.length > 0) {
+      if (res.data.payload) {
         const villageData = res.data.payload;
         setVillageDetails(villageData);
-        setProjects(calculateProjects(villageData.problems));
+
+        const summary = {
+          pending: villageData.problems.filter(p => p.status === "pending").length,
+          ongoing: villageData.problems.filter(p => p.status === "ongoing").length,
+          upcoming: villageData.problems.filter(p => p.status === "upcoming").length,
+          past: villageData.problems.filter(p => p.status === "past").length,
+          all: villageData.problems.length
+        };
+        setProblemSummary(summary);
+
         localStorage.setItem("villageData", JSON.stringify(villageData));
       } else {
         throw new Error("No village data found");
@@ -76,73 +61,33 @@ const VillageProfile = () => {
       setError(err.message);
       const cached = localStorage.getItem("villageData");
       if (cached) {
-        const data = JSON.parse(cached);
-        setVillageDetails(data);
-        setProjects(calculateProjects(data.problems));
+        setVillageDetails(JSON.parse(cached));
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchTopTrusts = async () => {
-    if (!villageId) return setTopTrusts([]);
+  const fetchTopContributors = async () => {
+    if (!villageId) return;
 
     try {
-      setTrustsLoading(true);
-      const res = await axios.get(`http://localhost:9125/village-api/village/${villageId}`);
-      const data = res.data.payload || JSON.parse(localStorage.getItem("villageData"));
-      const trusts = data?.trusts || [];
-      const top3 = [...trusts]
-        .sort((a, b) => (b.total_money || 0) - (a.total_money || 0))
-        .slice(0, 3)
-        .map((t, i) => ({
-          id: t._id || i,
-          name: t.trust_name || "Anonymous Trust",
-          amount: t.total_money || 0,
-          rank: i + 1,
-          projects: Math.floor((t.total_money || 0) / 10000) || 1
-        }));
+      const res = await axios.get(`http://localhost:9125/village-api/village/${villageId}/top-contributors`);
+      const contributors = res.data.payload || [];
 
-      setTopTrusts(top3);
-      localStorage.setItem("topTrusts", JSON.stringify(top3));
+      const trusts = contributors.filter(c => c.type === 'trust');
+      const individuals = contributors.filter(c => c.type === 'individual');
+
+      setTopTrusts(trusts);
+      setTopIndividuals(individuals);
+
+      localStorage.setItem("topTrusts", JSON.stringify(trusts));
+      localStorage.setItem("topIndividuals", JSON.stringify(individuals));
     } catch (err) {
-      setTrustsError("Failed to load top contributors");
-      const cache = localStorage.getItem("topTrusts");
-      if (cache) setTopTrusts(JSON.parse(cache));
-    } finally {
-      setTrustsLoading(false);
-    }
-  };
-
-  const fetchTopIndividuals = async () => {
-    if (!villageId) return setTopIndividuals([]);
-
-    try {
-      setIndividualsLoading(true);
-      const res = await axios.get(`http://localhost:9125/village-api/village/${villageId}`);
-      const data = res.data.payload || JSON.parse(localStorage.getItem("villageData"));
-      const individuals = data?.user || [];
-
-      const top3 = [...individuals]
-        .sort((a, b) => (b.total_money || 0) - (a.total_money || 0))
-        .slice(0, 3)
-        .map((u, i) => ({
-          id: u._id || i,
-          name: u.user_name || "Anonymous Individual",
-          amount: u.total_money || 0,
-          rank: i + 1,
-          donations: Math.floor((u.total_money || 0) / 5000) || 1
-        }));
-
-      setTopIndividuals(top3);
-      localStorage.setItem("topIndividuals", JSON.stringify(top3));
-    } catch (err) {
-      setIndividualsError("Failed to load top individuals");
-      const cache = localStorage.getItem("topIndividuals");
-      if (cache) setTopIndividuals(JSON.parse(cache));
-    } finally {
-      setIndividualsLoading(false);
+      const cacheTrusts = localStorage.getItem("topTrusts");
+      const cacheIndividuals = localStorage.getItem("topIndividuals");
+      if (cacheTrusts) setTopTrusts(JSON.parse(cacheTrusts));
+      if (cacheIndividuals) setTopIndividuals(JSON.parse(cacheIndividuals));
     }
   };
 
@@ -153,13 +98,9 @@ const VillageProfile = () => {
     const state = villageDetails.state || "Andhra Pradesh";
     const pincode = villageDetails.pincode || "522414";
 
-    setMapLoading(true);
-
     try {
       const res = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-          `${villageName}, ${pincode}, ${state}, India`
-        )}&key=${MAPS_API_KEY}`
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(`${villageName}, ${pincode}, ${state}, India`)}&key=${MAPS_API_KEY}`
       );
 
       if (res.data.results?.length > 0) {
@@ -178,13 +119,12 @@ const VillageProfile = () => {
           )}%3C/text%3E%3C/svg%3E`
         );
       }
-    } finally {
-      setMapLoading(false);
     }
   };
 
   const openGoogleMaps = () => {
     if (!villageDetails) return;
+
     const villageName = villageDetails.name || "Tangeda";
     const state = villageDetails.state || "Andhra Pradesh";
     const pincode = villageDetails.pincode || "522414";
@@ -210,13 +150,14 @@ const VillageProfile = () => {
 
     if (villageId) {
       getVillage();
-      fetchTopTrusts();
-      fetchTopIndividuals();
+      fetchTopContributors();
     }
   }, [villageId]);
 
   useEffect(() => {
-    if (villageDetails) getVillageImage();
+    if (villageDetails) {
+      getVillageImage();
+    }
   }, [villageDetails]);
 
   if (!villageId) {
@@ -228,53 +169,248 @@ const VillageProfile = () => {
   }
 
   return (
-    <div className="container my-4">
-      <h2 className="text-center mb-3">{villageDetails?.name}, {villageDetails?.state}</h2>
+    <div className="container my-4" style={{ maxWidth: '1200px' }}>
+      <h2 className="text-center mb-4" style={{ color: '#2c3e50', fontWeight: '600' }}>
+        {villageDetails?.name}, {villageDetails?.state}
+      </h2>
 
-      {mapLoading ? (
-        <div className="text-center">Loading Map...</div>
-      ) : (
-        <img src={imageUrl} alt="Village Map" className="img-fluid rounded" onClick={openGoogleMaps} style={{ cursor: "pointer" }} />
-      )}
+      <div className="row">
+        {/* Left Column (30%) - Village Details, Top Trusts, Top Individuals */}
+        <div className="col-md-4">
+          {/* Village Details Card */}
+          <div className="card mb-4 border-0 shadow-sm">
+            <div className="card-body" style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+              <h4 className="card-title mb-3" style={{ color: '#3498db', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>
+                Village Details
+              </h4>
+              {imageUrl && (
+                <img 
+                  src={imageUrl} 
+                  alt="Village Map" 
+                  className="img-fluid rounded mb-3 shadow" 
+                  onClick={openGoogleMaps} 
+                  style={{ cursor: "pointer", border: '1px solid #dee2e6' }} 
+                />
+              )}
+              <button 
+                className="btn w-100 mb-3"
+                onClick={openGoogleMaps}
+                style={{ backgroundColor: '#3498db', color: 'white', fontWeight: '500' }}
+              >
+                Open in Google Maps
+              </button>
+              <div className="mt-3">
+                <p className="mb-2"><strong style={{ color: '#2c3e50' }}>Pincode:</strong> <span style={{ color: '#7f8c8d' }}>{villageDetails?.pincode}</span></p>
+                <p className="mb-0"><strong style={{ color: '#2c3e50' }}>Contact:</strong> <span style={{ color: '#7f8c8d' }}>{villageDetails?.contact}</span></p>
+              </div>
+            </div>
+          </div>
 
-      <div className="mt-4">
-        <h4>Projects</h4>
-        {Object.entries(projectCounts).map(([type, count]) => (
-          <button key={type} onClick={() => handleProjectClick(type)} className="btn btn-outline-primary m-1">
-            {type.charAt(0).toUpperCase() + type.slice(1)} ({count})
-          </button>
-        ))}
-      </div>
+          {/* Top Trusts Card */}
+          <div className="card mb-4 border-0 shadow-sm">
+            <div className="card-body" style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+              <h4 className="card-title mb-3" style={{ color: '#3498db', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>
+                Top Trusts
+              </h4>
+              {topTrusts.length > 0 ? (
+                <div className="list-group">
+                  {topTrusts.map(trust => (
+                    <div 
+                      key={trust._id || trust.rank} 
+                      className="list-group-item py-2 border-0 mb-1" 
+                      style={{ backgroundColor: 'white', borderRadius: '5px' }}
+                    >
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="small" style={{ color: '#2c3e50' }}>
+                          {trust.rank}. {trust.trust_name}
+                        </span>
+                        <span className="badge" style={{ backgroundColor: '#2ecc71', color: 'white' }}>
+                          ₹{trust.total_money}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="small text-muted mb-0">No trust contributions found</p>
+              )}
+            </div>
+          </div>
 
-      <div className="mt-4">
-        <h4>Top Trusts</h4>
-        {trustsLoading ? <p>Loading...</p> : topTrusts.map(t => (
-          <div key={t.id}>{t.rank}. {t.name} - ₹{t.amount}</div>
-        ))}
-        {trustsError && <p className="text-danger">{trustsError}</p>}
-      </div>
+          {/* Top Individuals Card */}
+          <div className="card mb-4 border-0 shadow-sm">
+            <div className="card-body" style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+              <h4 className="card-title mb-3" style={{ color: '#3498db', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>
+                Top Individuals
+              </h4>
+              {topIndividuals.length > 0 ? (
+                <div className="list-group">
+                  {topIndividuals.map(individual => (
+                    <div 
+                      key={individual._id || individual.rank} 
+                      className="list-group-item py-2 border-0 mb-1" 
+                      style={{ backgroundColor: 'white', borderRadius: '5px' }}
+                    >
+                      <div className="d-flex justify-content-between align-items-center">
+                        <span className="small" style={{ color: '#2c3e50' }}>
+                          {individual.rank}. {individual.user_name}
+                        </span>
+                        <span className="badge" style={{ backgroundColor: '#2ecc71', color: 'white' }}>
+                          ₹{individual.total_money}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="small text-muted mb-0">No individual contributions found</p>
+              )}
+            </div>
+          </div>
+        </div>
 
-      <div className="mt-4">
-        <h4>Top Individuals</h4>
-        {individualsLoading ? <p>Loading...</p> : topIndividuals.map(u => (
-          <div key={u.id}>{u.rank}. {u.name} - ₹{u.amount}</div>
-        ))}
-        {individualsError && <p className="text-danger">{individualsError}</p>}
+        {/* Right Column (70%) - Projects Summary */}
+        <div className="col-md-8">
+          <div className="card h-100 border-0 shadow-sm">
+            <div className="card-body" style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+              <h4 className="card-title mb-4" style={{ color: '#3498db', borderBottom: '2px solid #3498db', paddingBottom: '8px' }}>
+                Projects Summary
+              </h4>
+              <div className="row">
+                {Object.entries(problemSummary).map(([type, count]) => {
+                  if (type === 'all') return null;
+                  
+                  // Define colors based on project type
+                  let cardColor, textColor;
+                  switch(type) {
+                    case 'pending':
+                      cardColor = '#f39c12'; // Orange
+                      textColor = 'white';
+                      break;
+                    case 'ongoing':
+                      cardColor = '#3498db'; // Blue
+                      textColor = 'white';
+                      break;
+                    case 'upcoming':
+                      cardColor = '#9b59b6'; // Purple
+                      textColor = 'white';
+                      break;
+                    case 'past':
+                      cardColor = '#95a5a6'; // Gray
+                      textColor = 'white';
+                      break;
+                    default:
+                      cardColor = '#ecf0f1'; // Light gray
+                      textColor = '#2c3e50';
+                  }
+                  
+                  return (
+                    <div key={type} className="col-md-6 mb-3">
+                      <div 
+                        className="card clickable-card h-100 border-0 shadow-sm"
+                        onClick={() => handleProjectClick(type)}
+                        style={{ 
+                          cursor: 'pointer',
+                          backgroundColor: cardColor,
+                          transition: 'transform 0.2s',
+                          borderRadius: '10px'
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
+                        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                      >
+                        <div className="card-body text-center py-4">
+                          <h5 
+                            className="text-capitalize mb-3" 
+                            style={{ color: textColor, fontWeight: '500' }}
+                          >
+                            {type}
+                          </h5>
+                          <h3 
+                            className="display-4 mb-2" 
+                            style={{ color: textColor, fontWeight: '600' }}
+                          >
+                            {count}
+                          </h3>
+                          <p 
+                            className="small mb-0" 
+                            style={{ color: textColor, opacity: 0.8 }}
+                          >
+                            Click to view details
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Modal for Projects */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h5>{modalTitle}</h5>
-              <button className="close-button" onClick={() => setShowModal(false)}>&times;</button>
+        <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content border-0 shadow-lg">
+              <div className="modal-header" style={{ backgroundColor: '#3498db', color: 'white' }}>
+                <h5 className="modal-title">{modalTitle}</h5>
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {modalProjects.length > 0 ? (
+                  <div className="list-group">
+                    {modalProjects.map((project, index) => (
+                      <div 
+                        key={index} 
+                        className="list-group-item border-0 mb-2 shadow-sm"
+                        style={{ borderRadius: '5px' }}
+                      >
+                        <h5 style={{ color: '#2c3e50' }}>{project.title}</h5>
+                        <p style={{ color: '#7f8c8d' }}>{project.description}</p>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span style={{ color: '#3498db', fontWeight: '500' }}>
+                            Estimated: ₹{project.estimatedamt}
+                          </span>
+                          <span 
+                            className="badge" 
+                            style={{ 
+                              backgroundColor: 
+                                project.status === 'ongoing' ? '#3498db' : 
+                                project.status === 'pending' ? '#f39c12' : '#95a5a6',
+                              color: 'white'
+                            }}
+                          >
+                            {project.status}
+                          </span>
+                        </div>
+                        {project.posted_time && (
+                          <small className="text-muted d-block mt-2">
+                            Posted: {new Date(project.posted_time).toLocaleString()}
+                          </small>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">No projects found in this category</p>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn" 
+                  onClick={() => setShowModal(false)}
+                  style={{ backgroundColor: '#95a5a6', color: 'white' }}
+                >
+                  Close
+                </button>
+              </div>
             </div>
-            <ul>
-              {modalProjects.map((project, index) => (
-                <li key={index}>{project}</li>
-              ))}
-            </ul>
           </div>
         </div>
       )}
@@ -283,3 +419,4 @@ const VillageProfile = () => {
 };
 
 export default VillageProfile;
+

@@ -3,213 +3,160 @@
 ###
 GET http://localhost:9125/village-api/village
 
-
 ###
-GET http://localhost:9125/village-api/village/67fcf2d87fe5dbaf2686b01d/problem-status
-
-###
-GET http://localhost:9125/village-api/village/tangeda
+GET http://localhost:9125/village-api/village/Lakshmi Nagar
 
 ###
 POST http://localhost:9125/village-api/village
 Content-Type: application/json
 
 {
-  "name": "Tangeda",
-  "email": "sarika@gmail.com",
-  "password": "Abc@123",
+  "name": "Lakshmi Nagar",
+  "email": "sarpanch.lakshminagar@example.com",
+  "password": "securePassword123",
   "state": "Telangana",
-  "pincode": "522414",
+  "pincode": "500001",
   "contact": "9876543210",
   "approved": true,
   "sarpanch": true,
-
   "problems": [
     {
-      "title": "Water Supply System",
+      "title": "Rebuild Community Hall",
       "estimatedamt": 500000,
-      "description": "Install new pipelines and water tanks",
-      "status": "ongoing",
-      "assigned_trust": "6601f7332a0e4d3b1c67e345",
-      "money_trust": 300000,
-      "posted_time": "2024-12-15T08:00:00Z",
-      "money_sanction_time": "2025-01-05T08:00:00Z",
-      "solved_time": null,
-      "done_by_village": "started",
+      "description": "Need to rebuild the old community hall to host events.",
+      "status": "upcoming",
+      "done_by_village": "accepted",
       "done_by_trust": "accepted"
+    },
+    {
+      "title": "Fix Drinking Water Supply",
+      "estimatedamt": 200000,
+      "description": "Pipes are leaking. Need urgent repairs.",
+      "status": "ongoing",
+      "done_by_village": "started",
+      "done_by_trust": "started"
     }
   ],
-
   "feedback": [
     {
-      "trust_id": "6601f7332a0e4d3b1c67e345",
-      "message": "Great collaboration!",
-      "rating": 4
+      "trust_id": "662b978ee3dc0b9ed08345c1",
+      "message": "Very helpful trust, quick response!",
+      "rating": 5
     }
   ],
-
   "money_lent": [
     {
-      "user_id": "6601f7332a0e4d3b1c67e345",
-      "amount": 200000,
-      "date": "2025-01-01T00:00:00Z"
+      "user_id": "662b97c3e3dc0b9ed08345c3",
+      "amount": 25000
     }
   ],
-
   "trusts": [
     {
-      "trust_name": "Hope Trust",
-      "total_money": 200000
+      "trust_name": "Helping Hands Trust",
+      "total_money": 100000
     }
   ],
-
   "user": [
     {
-      "user_name": "John Doe",
-      "total_money": 50000
+      "user_name": "Ravi Kumar",
+      "total_money": 5000
     }
   ],
-
   "rating": 4.5
 }
 
-
-
 ###
-PUT http://localhost:9125/village-api/village
+PUT http://localhost:9125/village-api/gadwal/add-problem
 Content-Type: application/json
 
 {
-  "name": "rampur Village",
-  "email": "rampur@example.com",
-  "password": "hashedpassword123",
-  "address": "Rajapur, India",
-  "contact": "+91 9876543210",
-  "approved": false,
-  "sarpanch": true,
-  "problems": [
-    {
-      "description": "Current issue in the main street",
-      "reported_by": "Vikas Sharma",
-      "status": "pending",
-      "assigned_trust": null
-    }
-  ]
+  "title": "water",
+  "description": "ground pipeline broken",
+  "estimatedamt": 100
 }
 
-###
-PUT http://localhost:9125/village-api/add-problem
-Content-Type: application/json
 
-{
-  "name": "tangeda",
-  "problem": {
-    "description": "ground pipeline broken",
-    "reported_by":"Rajesh"
-  }
-}
+
 
 # trust-req
 
 ###
-GET http://localhost:9125/trust-api/trust
+GET http://localhost:9125/trust-api/trust 
+
+###
+get http://localhost:9125/trust-api/trust/Helping Hands Trust
 
 ###
 POST http://localhost:9125/trust-api/trust
 Content-Type: application/json
 
 {
-  "name": "Sarika",
+  "name": "Helping Hands Trust",
   "username": "helpinghands",
-  "email": "contact@helpinghands.org",
-  "password": "Abc@123",
-  "address": "456 Hope Street, Hyderabad, Telangana",
-  "contact": "9876543210",
+  "email": "helpinghands@example.com",
+  "password": "trustPassword123",
+  "address": "123 Charity Lane, Hyderabad, Telangana",
+  "contact": "9123456789",
   "approved": true,
-
+  
   "projects": {
     "past": [
       {
-        "title": "School Kit Distribution",
-        "description": "Distributed school kits to underprivileged children",
-        "completionDate": "2024-12-15T00:00:00Z"
+        "title": "Clean Water Project",
+        "description": "Installed water purifiers in 5 villages.",
+        "completionDate": "2024-12-01",
+        "money": 500000
       }
     ],
     "ongoing": [
       {
-        "title": "Village Cleanliness Drive",
-        "description": "Running awareness and cleaning programs",
-        "startDate": "2025-03-01T00:00:00Z",
+        "title": "School Renovation",
+        "description": "Renovating primary school buildings.",
+        "startDate": "2025-03-10",
+        "money": 750000,
         "progressUpdates": [
           {
-            "date": "2025-03-10T00:00:00Z",
-            "update": "Phase 1 completed: Public areas cleaned"
+            "date": "2025-04-20",
+            "update": "Foundation work completed."
           },
           {
-            "date": "2025-03-20T00:00:00Z",
-            "update": "Phase 2 ongoing: Household waste management workshops"
+            "date": "2025-04-25",
+            "update": "Walls under construction."
           }
         ]
       }
     ],
     "upcoming": [
       {
-        "title": "Free Health Checkup Camp",
-        "description": "Health services to be provided in rural areas",
-        "plannedStartDate": "2025-06-01T00:00:00Z"
+        "title": "Healthcare Camp",
+        "description": "Organizing free health check-ups for villagers.",
+        "money": 200000
       }
     ]
   },
 
   "funding": {
-    "total_received": 1000000,
-    "total_disbursed": 750000
+    "total_received": 1500000,
+    "total_disbursed": 1250000
   },
-
-  "money_support_available": true,
 
   "feedback": [
     {
-      "village_id": "6601f7002a0e4d3b1c67e222",
-      "message": "The support was timely and helpful.",
+      "village_id": "662c1234abcd5678ef901234",
+      "message": "Amazing support during hard times!",
       "rating": 5
-    },
-    {
-      "village_id": "6601f7002a0e4d3b1c67e333",
-      "message": "Great assistance with water project.",
-      "rating": 4
-    }
-  ],
-
-  "initiatives": [
-    {
-      "title": "Digital Literacy Mission",
-      "description": "Educating villagers about basic computer usage",
-      "villager_requests": [
-        {
-          "village_id": "6601f7002a0e4d3b1c67e222",
-          "request_date": "2025-04-01T00:00:00Z",
-          "status": "approved"
-        },
-        {
-          "village_id": "6601f7002a0e4d3b1c67e444",
-          "request_date": "2025-04-03T00:00:00Z",
-          "status": "pending"
-        }
-      ]
     }
   ],
 
   "assigned_problems": [
     {
-      "village_id": "6601f7002a0e4d3b1c67e222",
-      "problem_index": 0,
-      "status": "in-progress"
-    },
-    {
-      "village_id": "6601f7002a0e4d3b1c67e555",
-      "problem_index": 1,
-      "status": "solved"
+      "problem_id": "662c5678abcd1234ef905678",
+      "village_id": "662c1234abcd5678ef901234",
+      "status": "ongoing",
+      "posted_time": "2025-04-10",
+      "money_sanction_time": "2025-04-15",
+      "solved_time": null,
+      "money_trust": 500000
     }
   ],
 
@@ -221,49 +168,76 @@ PUT http://localhost:9125/trust-api/trust
 Content-Type: application/json
 
 {
-  "name": "Rajapur Village",
-  "username":"HHTT",
+  "name": "Helping Hands Trust",
+  "username": "helpinghands",
   "email": "helpinghands@example.com",
-  "password": "hashedpassword123",
-  "address": "Rajapur, Maharashtra, India",
-  "contact": "+91 9876543210",
-  "approved": false,
-  "sarpanch": true,
-  "problems": [
-    {
-      "description": "Water supply issue in the main street",
-      "reported_by": "Vikas Sharma",
-      "status": "on process",
-      "assigned_trust": "abc"
-    },
-    {
-      "description": "Broken street lights in the village center",
-      "reported_by": "Sunita Devi",
-      "status": "done",
-      "assigned_trust": "65f1234abcd56789ef012345"
-    }
-  ],
+  "password": "Abc123",
+  "address": "123 Charity Lane, Hyderabad, Telangana",
+  "contact": "9123456789",
+  "approved": true,
+  
+  "projects": {
+    "past": [
+      {
+        "title": "Clean Water Project",
+        "description": "Installed water purifiers in 5 villages.",
+        "completionDate": "2024-12-01",
+        "money": 500000
+      }
+    ],
+    "ongoing": [
+      {
+        "title": "School Renovation",
+        "description": "Renovating primary school buildings.",
+        "startDate": "2025-03-10",
+        "money": 750000,
+        "progressUpdates": [
+          {
+            "date": "2025-04-20",
+            "update": "Foundation work completed."
+          },
+          {
+            "date": "2025-04-25",
+            "update": "Walls under construction."
+          }
+        ]
+      }
+    ],
+    "upcoming": [
+      {
+        "title": "Healthcare Camp",
+        "description": "Organizing free health check-ups for villagers.",
+        "money": 200000
+      }
+    ]
+  },
+
+  "funding": {
+    "total_received": 1500000,
+    "total_disbursed": 1250000
+  },
+
   "feedback": [
     {
-      "trust_id": "65f5678abcd90123ef456789",
-      "message": "The trust provided good support for the school renovation.",
-      "rating": 4
+      "village_id": "662c1234abcd5678ef901234",
+      "message": "Amazing support during hard times!",
+      "rating": 5
     }
   ],
-  "resources_shared": [
+
+  "assigned_problems": [
     {
-      "trust_id": "65f9876abcd54321ef098765",
-      "resources": ["Wheat", "Rice", "Medical Supplies"]
+      "problem_id": "662c5678abcd1234ef905678",
+      "village_id": "662c1234abcd5678ef901234",
+      "status": "ongoing",
+      "posted_time": "2025-04-10",
+      "money_sanction_time": "2025-04-15",
+      "solved_time": null,
+      "money_trust": 500000
     }
   ],
-  "money_lent": [
-    {
-      "trust_id": "65f4321abcd67890ef123456",
-      "amount": 50000,
-      "date": "2025-01-15T00:00:00.000Z"
-    }
-  ],
-  "rating": 4.5
+
+  "rating": 4.7
 }
 
 

@@ -7,7 +7,7 @@ const TrustSchema = new mongoose.Schema({
   password: { type: String, required: true },
   address: { type: String, required: true },
   contact: { type: String, required: true },
-  approved: { type: Boolean, default: false }, // Admin approval required
+  approved: { type: Boolean, default: false }, 
 
   projects: {
     past: [
@@ -15,6 +15,7 @@ const TrustSchema = new mongoose.Schema({
         title: String,
         description: String,
         completionDate: Date,
+        money:Number
       },
     ],
     ongoing: [
@@ -22,6 +23,7 @@ const TrustSchema = new mongoose.Schema({
         title: String,
         description: String,
         startDate: Date,
+        money:Number,
         progressUpdates: [
           {
             date: { type: Date, default: Date.now },
@@ -34,17 +36,14 @@ const TrustSchema = new mongoose.Schema({
       {
         title: String,
         description: String,
-        plannedStartDate: Date,
+        money:Number
       },
     ],
   },
-
   funding: {
     total_received: { type: Number, default: 0 },
-    total_disbursed: { type: Number, default: 0 },
-  },
-
-  money_support_available: { type: Boolean, default: false },
+    total_disbursed: { type: Number, default: 0 },
+  },
 
   feedback: [
     {
@@ -54,37 +53,27 @@ const TrustSchema = new mongoose.Schema({
     },
   ],
 
-  initiatives: [
-    {
-      title: String,
-      description: String,
-      villager_requests: [
-        {
-          village_id: { type: mongoose.Schema.Types.ObjectId, ref: "Village" },
-          request_date: { type: Date, default: Date.now },
-          status: {
-            type: String,
-            enum: ["pending", "approved", "rejected"],
-            default: "pending",
-          },
-        },
-      ],
-    },
-  ],
 
   assigned_problems: [
     {
+      problem_id: { type: mongoose.Schema.Types.ObjectId },
       village_id: { type: mongoose.Schema.Types.ObjectId, ref: "Village" },
-      problem_index: { type: Number, required: true }, // Index of the problem in Village.problems
+  
       status: {
         type: String,
-        enum: ["in-progress", "solved"],
-        default: "in-progress",
+        enum: ["pending", "upcoming", "ongoing", "past"],
+        default: "pending",
       },
-    },
+  
+      posted_time: { type: Date, default: Date.now },
+      money_sanction_time: { type: Date },
+      solved_time: { type: Date },
+  
+      money_trust: { type: Number, default: 0 },
+    }
   ],
 
-  rating: { type: Number, default: 0 }, // Trust rating based on contributions
+  rating: { type: Number, default: 0 }, 
 });
 
 const Trust = mongoose.model("Trust", TrustSchema);

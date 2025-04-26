@@ -29,6 +29,5 @@ const AdminSchema = new mongoose.Schema({
   ],
 });
 
-// Hash password before saving
 
 module.exports = mongoose.model("Admin", AdminSchema);

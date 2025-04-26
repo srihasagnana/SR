@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { TrustContext } from "../Context/LoginT_Context";
-// import "./Trust_profile.css";
 
 const TrustProfile = () => {
   const { currentTrust } = useContext(TrustContext);
