@@ -43,24 +43,47 @@ trustApp.put('/trust', eah(async (req, res) => {
 
 // ✅ Update a problem's status by trust as accepted
 trustApp.put('/trust/accept', eah(async (req, res) => {
-  const { villageId, problemId } = req.body;
+  const { villageId, problemId, trustId } = req.body;
 
   const village = await Village.findById(villageId);
+  const trust = await Trust.findById(trustId);
+
   if (!village) return res.status(404).send({ message: "Village not found" });
+  if (!trust) return res.status(404).send({ message: "Trust not found" });
 
   const problem = village.problems.id(problemId);
   if (!problem) return res.status(404).send({ message: "Problem not found" });
 
+  // 1️⃣ Update done_by_trust
   problem.done_by_trust = "accepted";
 
-  // Optional: auto-move to 'past' if village also completed
-  if (problem.done_by_village==="accepted") {
-    problem.status = 'upcoming';
+  // 2️⃣ Check if both accepted
+  if (problem.done_by_village === "accepted" && problem.done_by_trust === "accepted") {
+    problem.status = "ongoing"; // 🚀 Work can start
+  } else {
+    problem.status = "upcoming"; // Waiting for both acceptance
   }
 
+  // 3️⃣ Update trust's assigned problems
+  trust.assigned_problems.push({
+    problem_id: problem._id,
+    village_id: village._id,
+    status: "upcoming", // Trust always starts as upcoming
+    posted_time: problem.posted_time,
+    money_trust: problem.money_trust || 0,
+  });
+
   await village.save();
-  res.send({ message: "Trust status updated", payload: problem });
+  await trust.save();
+
+  res.send({ 
+    message: "Problem accepted successfully and backend updated! Waiting for village confirmation.",
+    payload: problem 
+  });
 }));
+
+
+
 
 // ✅ Update a problem's status by trust as started
 trustApp.put('/trust/start', eah(async (req, res) => {

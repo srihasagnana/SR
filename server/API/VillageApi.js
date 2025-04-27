@@ -20,6 +20,7 @@ villageApp.get('/village/:name', eah(async (req, res) => {
     res.status(200).send({ message: "Village details", payload: village })
 }))
 
+// get problem-status
 villageApp.get('/village/:id/problem-status', eah(async (req, res) => {
     const villageId = req.params.id
     const village = await Village.findById(villageId)
@@ -85,6 +86,94 @@ villageApp.put('/:name/add-problem', eah(async (req, res) => {
         payload: village.problems[village.problems.length - 1] 
     })
 }))
+
+
+// Update done_by_trust status to accepted
+villageApp.put('/:villageId/problem/:problemId/accept', eah(async (req, res) => {
+    const { villageId, problemId } = req.params;
+
+    const village = await Village.findById(villageId);
+    if (!village) return res.status(404).send({ message: "Village not found" });
+
+    const problem = village.problems.id(problemId);
+    if (!problem) return res.status(404).send({ message: "Problem not found" });
+
+    // Update directly since done_by_trust is a string
+    problem.done_by_trust = 'accepted';
+    
+    await village.save();
+    
+    res.status(200).send({ 
+        message: "Trust status updated to accepted", 
+        payload: problem 
+    });
+}));
+
+// Update done_by_village status to accepted
+villageApp.put('/:villagename/problem/:problemId/village-accept', eah(async (req, res) => {
+    const villageName = req.params.villagename;
+
+    try {
+        const village = await Village.findOne({name:villageName});
+        if (!village) return res.status(404).send({ message: "Village not found" });
+
+    const problemId = req.params.problemId;
+        const problem = village.problems.id(problemId);
+        if (!problem) return res.status(404).send({ message: "Problem not found" });
+
+        // Update village acceptance status
+        problem.done_by_village = 'accepted';
+        
+        // Update status based on trust's acceptance
+        if (problem.done_by_trust === 'accepted') {
+            problem.status = 'upcoming';
+        } else {
+            problem.status = 'pending';
+        }
+        
+        await village.save();
+        
+        // Return the updated problem
+        res.status(200).send({ 
+            message: "Village acceptance status updated successfully", 
+            payload: problem 
+        });
+    } catch (error) {
+        console.error("Error updating village acceptance:", error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+}));
+
+// API to get problems of a village where done_by_trust is "accepted"
+villageApp.get('/:villageName/problems/accepted', async (req, res) => {
+    const villageName = req.params.villageName;
+  
+    try {
+      // Find the village by name
+      const village = await Village.findOne({ name: villageName });
+  
+      if (!village) {
+        return res.status(404).send({ message: 'Village not found' }); // You can adjust this response
+      }
+  
+      // Filter accepted problems
+      const acceptedProblems = village.problems.filter(
+        (problem) => problem.done_by_trust === 'accepted' && problem.status === 'pending'
+      );
+  
+      if (acceptedProblems.length === 0) {
+        return res.status(200).send({ message: 'No accepted problems found', payload: [] }); // Empty array if no accepted problems
+      }
+  
+      res.status(200).send({ message: 'Accepted problems found', payload: acceptedProblems });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Server error' });
+    }
+  });
+  
+  
+  
 
 // Get top contributors
 villageApp.get('/village/:id/top-contributors', eah(async (req, res) => {

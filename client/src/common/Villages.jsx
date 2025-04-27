@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import styles from './Village.module.css'; // ✅ Using CSS module
+import styles from './Village.module.css';
 
 function Villages() {
   const [villages, setVillages] = useState([]);
   const [error, setError] = useState('');
   const [selectedVillage, setSelectedVillage] = useState(null);
-
-  
+  const [statusMessage, setStatusMessage] = useState('');
+  const [acceptedProblems, setAcceptedProblems] = useState({});
 
   async function fetchVillages() {
     try {
@@ -19,6 +19,7 @@ function Villages() {
         setError(res.data.message);
       }
     } catch (err) {
+      console.error('Fetch villages error:', err.response ? err.response.data : err.message);
       setError('Failed to fetch villages');
     }
   }
@@ -41,6 +42,35 @@ function Villages() {
       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${villageName}, ${pincode}, ${state}`)}`,
       '_blank'
     );
+  };
+
+  const handleAccept = async (villageId, problemId) => {
+    console.log('Accepting project:', { villageId, problemId });
+    
+    try {
+      const response = await axios.put(
+        `http://localhost:9125/village-api/${villageId}/problem/${problemId}/accept`,
+        {}
+      );
+  
+      console.log('Accept response:', response.data);
+  
+      if (response.data.message.includes("sent to villagers")) {
+        setStatusMessage("✅ Request sent to villagers. Waiting for their confirmation...");
+        setAcceptedProblems(prev => ({
+          ...prev,
+          [`${villageId}-${problemId}`]: true
+        }));
+      } else {
+        setStatusMessage(response.data.message || 'Status updated');
+      }
+  
+      fetchVillages();
+      setTimeout(() => setSelectedVillage(null), 2000);
+    } catch (error) {
+      console.error('Error updating status:', error.response ? error.response.data : error.message);
+      setStatusMessage(error.response?.data?.message || 'Failed to update status');
+    }
   };
 
   return (
@@ -73,25 +103,37 @@ function Villages() {
             <h2>{selectedVillage.name}</h2>
             <p><b>Contact:</b> {selectedVillage.contact}</p>
             <p><b>Email:</b> {selectedVillage.email}</p>
-            <button className={styles.villageMapButton}  onClick={openGoogleMaps}>
+            <button className={styles.villageMapButton} onClick={openGoogleMaps}>
               <i className="bi bi-map me-2"></i> Open in Google Maps
             </button>
+
             <h3 className='mt-3'>Pending Projects:</h3>
             {getPendingProjects(selectedVillage.problems).map((proj, index) => (
-              <div key={index} className={styles.villageProject}>
-                <p><b>Title:</b> {proj.title}</p>
-                <p><b>Description:</b> {proj.description}</p>
-                <p><b>Estimated Amount:</b> {proj.estimatedamt}</p>
-                <button onClick={() => console.log("Accept clicked", proj)} className={styles.villageAcceptButton}>
-                  Accept
-                </button>
-              </div>
-            ))}
+  <div key={index} className={styles.villageProject}>
+    <p><b>Title:</b> {proj.title}</p>
+    <p><b>Description:</b> {proj.description}</p>
+    <p><b>Estimated Amount:</b> {proj.estimatedamt}</p>
+    {acceptedProblems[`${selectedVillage._id}-${proj._id}`] || proj.done_by_trust === 'accepted' ? (
+      <div className="text-danger">
+        Request sent to villagers...
+      </div>
+    ) : (
+      <button
+        onClick={() => handleAccept(selectedVillage._id, proj._id)}
+        className={styles.villageAcceptButton}
+      >
+        Accept
+      </button>
+    )}
+  </div>
+))}
+
           </div>
         </div>
       )}
 
-      {error && <p>{error}</p>}
+      {statusMessage && <p className={styles.villageStatusMessage}>{statusMessage}</p>}
+      {error && <p className={styles.villageStatusMessage}>{error}</p>}
     </div>
   );
 }

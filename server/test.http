@@ -3,8 +3,11 @@
 ###
 GET http://localhost:9125/village-api/village
 
+### get where done_by_trust is "accepted"
+get http://localhost:9125/village-api/Tangeda/problems/accepted
+
 ###
-GET http://localhost:9125/village-api/village/Lakshmi Nagar
+GET http://localhost:9125/village-api/village/Tangeda
 
 ###
 POST http://localhost:9125/village-api/village
@@ -75,8 +78,21 @@ Content-Type: application/json
   "estimatedamt": 100
 }
 
+### put trust accept status
+put http://localhost:9125/village-api/680ce8361f661dfcb2b482c4/problem/680d0934eaa62ef0a866bf27/accept
+Content-Type: application/json
 
+{
+  "done_by_village": "accepted"
+}
 
+### put village accept status
+PUT http://localhost:9125/village-api/gadwal/problem/680dbfcd6e8961a5bb4bb934/village-accept
+Content-Type: application/json
+
+{
+  "done_by_village": "accepted"
+}
 
 # trust-req
 

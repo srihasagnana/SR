@@ -419,4 +419,3 @@ const VillageProfile = () => {
 };
 
 export default VillageProfile;
-

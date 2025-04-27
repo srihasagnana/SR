@@ -20,6 +20,7 @@ import Village_header from './village/Village_header'
 import Village_profile from './village/Village_profile'
 import Individual_profile from './individual/Individual_profile'
 import Add_prob from './village/Add_prob'
+import Accepted from './village/Accepted'
 function App() {
 
   let b = createBrowserRouter([
@@ -102,6 +103,10 @@ function App() {
             {
               path:'add-problem',
               element:<Add_prob/>
+            },
+            {
+              path:'accepted',
+              element:<Accepted/>
             }
           ]
           }
